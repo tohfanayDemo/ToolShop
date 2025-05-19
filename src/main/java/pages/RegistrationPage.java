@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
+import models.Register;
 import utilities.ElementUtil;
 
 public class RegistrationPage extends Banner {
@@ -35,6 +37,7 @@ public class RegistrationPage extends Banner {
 
 	private By formEditFields = By.xpath("//form//input");
 	private By emptyFormErrMsgs = By.xpath("//form//div[contains(@class,'alert-danger')]");
+	
 
 	public RegistrationPage(WebDriver driver) {
 		super(driver);
@@ -87,25 +90,25 @@ public class RegistrationPage extends Banner {
 	}
 
 		
-	public Object enterFormData(String validOrInvalid, String fName, String lName, String DOB, String street, String postCode, String city, String state, 
-			  String country, String phoneNum, String emailID, String password) {
-		  
-		  util.doSendKeys(firstNameField, fName.trim());
-		  util.doSendKeys(lastNameField, lName.trim());
-		  util.doSendKeys(dobField, DOB.trim());
-		  util.doSendKeys(streetField, street.trim());
+	public Object enterFormData(String validOrInvalid, Register register) {	 
+		
+		  util.doSendKeys(firstNameField, register.getFirstName().trim());
+		  util.doSendKeys(lastNameField, register.getLastName().trim());
+		  util.doSendKeys(dobField, register.getDob().trim());
+		  util.doSendKeys(streetField, register.getStreet().trim());
 		  util.scrollIntoView(phoneField);
-		  util.doSendKeys(postalCodeField, postCode.trim());
-		  util.doSendKeys(cityField, city.trim());
-		  util.doSendKeys(stateField, state.trim());
+		  util.doSendKeys(postalCodeField, register.getPostalCode().trim());
+		  util.doSendKeys(cityField, register.getCity().trim());
+		  util.doSendKeys(stateField, register.getState().trim());
 		  
-		  if(!country.isBlank() || !country.isEmpty()) {
-			  util.setSelectOptionByValue(countryDropdown, country.trim()); 
+		  if(!register.getCountry().isBlank() || !register.getCountry().isEmpty()) {
+			  util.setSelectOptionByValue(countryDropdown, register.getCountry().trim()); 
 		  }
 		  
-		  util.doSendKeys(phoneField, phoneNum.trim());
-		  util.doSendKeys(emailField, emailID.trim());
-		  util.doSendKeys(passwordField, password.trim());
+		  util.doSendKeys(phoneField, register.getPhone().trim());
+		  util.doSendKeys(emailField, register.getEmail().trim());
+		  //util.doSendKeys(passwordField, register.getPassword().trim());
+		  enterPasswordValue(register.getPassword().trim());
 		  
 		  clickRegisterBtn();
 		  
@@ -113,19 +116,20 @@ public class RegistrationPage extends Banner {
 			  return new AccountPage(driver);
 		  } else return null;
 	  }
+	
+	
 	 
 
 	public void clickRegisterBtn() {
 		
 		try {
-			util.scrollToBottomOfPage();
 			util.doClick(registerButton);
-			Thread.sleep(3000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public int getFormFieldCount() {
 
 		int inputFieldCount = util.getElementSize(formEditFields);
@@ -145,7 +149,9 @@ public class RegistrationPage extends Banner {
 		
 		String errText = null;
 		if(getEmptyFormErrMsgCount() == 1) {
-			errText = util.getElementText(emptyFormErrMsgs);
+			System.out.println("Error text found");
+			WebElement ele = (util.getElement(emptyFormErrMsgs).findElement(By.tagName("div")));
+			errText = util.getElementText(ele);
 		}
 		
 		return errText.trim();

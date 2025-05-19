@@ -3,9 +3,11 @@ package stepDefs;
 import java.util.Map;
 
 import org.testng.Assert;
-import driver.WebDriverManager;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import driver.WebDriverManager;
+import models.Register;
 import pages.RegistrationPage;
 import utilities.Context;
 
@@ -61,9 +63,24 @@ public class RegistrationSteps {
 	public void user_enters_for_data_in_form_for_scenario(String testCase) {
 
 		data = context.getTestDataForTestCase(testCase.trim());
-		 registrationPage.enterFormData("Invalid", data.get("FirstName"), data.get("LastName"), data.get("DOB"), data.get("Street"), 
-				 data.get("PostalCode"), data.get("City"), data.get("State"), data.get("Country"), data.get("Phone"),
-				 data.get("Email"), data.get("Password"));
+		
+		//build register object
+		Register register = new Register.RegisterBuilder()
+		.setFirstName(data.get("FirstName"))
+		.setLastName(data.get("LastName"))
+		.setDob(data.get("DOB"))
+		.setStreet(data.get("Street"))
+		.setPostalCode(data.get("PostalCode"))
+		.setCity(data.get("City"))
+		.setState(data.get("State"))
+		.setCountry(data.get("Country"))
+		.setPhone(data.get("Phone"))
+		.setEmail(data.get("Email"))
+		.setPassword(data.get("Password"))
+		.build(); 
+		
+		registrationPage.enterFormData("Invalid", register);
+
 	}
 	
 	
@@ -72,7 +89,7 @@ public class RegistrationSteps {
 
 		String expectedErrMsg = data.get("Message").trim();		
 		String actualErrMsg = registrationPage.getErrMsgText();
-
+		System.out.println("Actual Error Msg Received = " + actualErrMsg);
 		Assert.assertEquals(expectedErrMsg, actualErrMsg);
 	}
 

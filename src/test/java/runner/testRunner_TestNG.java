@@ -6,7 +6,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(features = "src/test/resources/UI_Features",
 		        glue = {"stepDefs", "hooks"},
-		        tags = "@logintest",
+		        //tags = "@wip",
 		        monochrome = true,
 		        dryRun = false
 )
