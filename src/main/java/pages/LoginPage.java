@@ -7,7 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import utilities.ElementUtil;
+import utils.ElementUtil;
 
 public class LoginPage extends Banner{
 
@@ -21,6 +21,7 @@ public class LoginPage extends Banner{
 	private By forgotYourPwdLink = By.xpath("//a[text()='Forgot your Password?']");
 	private By errMsgs = By.xpath("//*[@class='alert alert-danger']");
 	private By emptyFormErrMsgs = By.xpath("//form//div[contains(@class,'alert-danger')]/div");
+	private By pageHeader = By.xpath("//div[contains(@class,'auth-form')]");
 
 	
 	public LoginPage(WebDriver driver) {
@@ -28,7 +29,11 @@ public class LoginPage extends Banner{
 		this.driver = driver;
 		util = new ElementUtil(driver);
 	}
-		
+	
+	public String getPageHeaderText() {
+		return util.getElementText(pageHeader);
+	}
+	
 	private void clickLoginBtn() {
 		util.doClick(loginButton);
 	}
@@ -39,11 +44,11 @@ public class LoginPage extends Banner{
 		}else util.doSendKeys(passwordField, value);
 	}
 	
-	public HomePage validLogin(String emailId, String password) {
+	public MyAccountPage validLogin(String emailId, String password) {
 		enterValue("email",emailId);
 		enterValue("password",password);
 		clickLoginBtn();
-		return new HomePage(driver);
+		return new MyAccountPage(driver);
 	}
 	
 	public List<String> invalidLogin(String emailId, String password) {

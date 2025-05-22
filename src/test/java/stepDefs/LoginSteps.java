@@ -1,5 +1,7 @@
 package stepDefs;
 
+import static org.testng.Assert.assertEquals;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,14 +14,16 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import pages.LoginPage;
+import pages.MyAccountPage;
 import pages.RegistrationPage;
-import utilities.Context;
+import utils.Context;
 
 public class LoginSteps {
 	
 	private Context context;
 	private WebDriver driver;
 	private LoginPage loginPage;
+	private MyAccountPage myAccountPage;
 	private List<String> actualErrMsgList;
 	private RegistrationPage registrationPage;
 	Map<String, String> data;
@@ -33,7 +37,27 @@ public class LoginSteps {
 	public void user_is_on_login_page() {
 		Assert.assertTrue(loginPage.getPageURL().contains(UIConstants.PARTIAL_URL_VALUE_LOGINPAGE));
 	}
-
+	
+	@When("User enters valid data in all field and clicks login button")
+	public void user_enters_valid_data_in_all_field_and_clicks_login_button() {
+		
+		/*
+		 * System.out.println("Useremail = " + context.getRuntimeData("userEmail"));
+		 * System.out.println("userPassword = " +
+		 * context.getRuntimeData("userPassword"));
+		 */
+		myAccountPage = loginPage.validLogin(String.valueOf(context.getRuntimeData("userEmail")), String.valueOf(context.getRuntimeData("userPassword")));
+		//myAccountPage = loginPage.validLogin("tofee123@gmail.com", "DuubDub$26");
+	}
+	
+	@Then("User should land on MyAccount page")
+	public void user_should_land_on_MyAccount_page() {
+		
+		assertEquals(myAccountPage.getPageHeaderText(), UIConstants.HEADER_VALUE_MYACCOUNTPAGE);
+	}
+	
+	/*********************** Validate login functionality with null user name ***************/
+	
 	@When("User enters value only in password and clicks login button")
 	public void user_enters_value_only_in_password_and_clicks_login_button() {
 		actualErrMsgList = loginPage.invalidLogin("", "Pwd123@@@!!!");
@@ -48,11 +72,15 @@ public class LoginSteps {
 		}
 	}
 
+	/*********************** Validate login functionality with null user password ***************/
+	
 	@When("User enters value only in email address and clicks login button")
 	public void user_enters_value_only_in_email_address_and_clicks_login_button() {
 		actualErrMsgList = loginPage.invalidLogin("abc123@gmail.com", "");
 
 	}
+
+	/*********************** Validate login functionality with null credentials ***************/
 
 	@When("User enters no values in email address and and password and clicks login button")
 	public void user_enters_no_values_in_email_address_and_and_password_and_clicks_login_button() {
@@ -65,7 +93,6 @@ public class LoginSteps {
 		if(actualErrMsgList.size()==2) {
 			Assert.assertEquals(actualErrMsgList.get(0), expectedEmailErrMsg);
 			Assert.assertEquals(actualErrMsgList.get(1), expectedPasswordErrMsg);
-
 		}
 	}
 	
@@ -101,4 +128,5 @@ public class LoginSteps {
 		Assert.assertEquals(expectedErrMsg, actualErrMsg);
 
 	}
+	
 }

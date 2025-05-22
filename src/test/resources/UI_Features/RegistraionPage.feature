@@ -11,9 +11,10 @@ Background:
 		When User clicks on Register button without filling up form
 		Then User sees error msg for each field
 	
-#	Scenario: User registers with valid data
-#		When User clicks on Register button with valid data
-#		Then User is navigated to Login Page	
+#	@registration_valid
+ #	Scenario: User registers with valid data
+ #		When User clicks on Register button with valid data
+ #		Then User is navigated to Login Page	
 		
 	@testData
 	Scenario Outline: Password fulfilling "<Testcase>" shows "<Level>" password strength

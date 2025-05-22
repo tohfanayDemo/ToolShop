@@ -11,8 +11,8 @@ import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.Scenario;
-import utilities.Context;
-import utilities.ExcelReader;
+import utils.Context;
+import utils.ExcelReader;
 
 
 public class Hooks {
@@ -83,7 +83,7 @@ public class Hooks {
 	@AfterAll
 	public static void externalFIleOrAppTearDown() {
 		try {
-					
+			
 			// Close the Excel file
 			ExcelReader.closeExcel();
 			System.out.println("Excel file closed successfully.");

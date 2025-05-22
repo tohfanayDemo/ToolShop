@@ -11,7 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import constants.PriceSort;
-import utilities.ElementUtil;
+import utils.ElementUtil;
 
 public class HomePage extends Banner{
 	
@@ -38,7 +38,11 @@ public class HomePage extends Banner{
 		this.driver = driver;
 		util = new ElementUtil(driver);
 	}
-
+	
+	public boolean doesSearchBoxExist() {
+		return util.isElementPresent(searchBox);
+	}
+	
 	public void selectPriceSortOption(String option) {
 		
 		String value = null;
@@ -249,7 +253,6 @@ public class HomePage extends Banner{
 		}
 	}
 	
-	
 	public void deselectBrandCheckbox(String checkboxName) {
 		
 		if(getPageURL().equals(baseURL+"/")) {
@@ -274,4 +277,23 @@ public class HomePage extends Banner{
 		}
 		
 	}
+	
+	public Map<String, Object> viewProduct(String productName) {
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		
+		String productPriceText = util.getElementText(By.xpath("//h5[@class='card-title' and normalize-space()='"+productName+"']/../..//span[@data-test='product-price']"));
+		String[] price = productPriceText.split("$");
+		
+		By productImage = By.xpath("//h5[@class='card-title' and normalize-space()='"+productName+"']/../..");
+		util.doClick(productImage);
+		
+		obj.put("productPrice", Integer.parseInt((price)[1]));
+		obj.put("pageObj", new ProductPage(driver));
+		
+		return obj;
+	}
+	
+	
+	
 }

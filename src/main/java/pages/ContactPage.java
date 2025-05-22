@@ -2,7 +2,7 @@ package pages;
 
 import org.openqa.selenium.WebDriver;
 
-import utilities.ElementUtil;
+import utils.ElementUtil;
 
 public class ContactPage extends Banner{
 

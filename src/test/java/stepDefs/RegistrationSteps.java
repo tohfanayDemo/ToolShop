@@ -3,17 +3,21 @@ package stepDefs;
 import java.util.Map;
 
 import org.testng.Assert;
+
+import constants.UIConstants;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import driver.WebDriverManager;
 import models.Register;
+import pages.LoginPage;
 import pages.RegistrationPage;
-import utilities.Context;
+import utils.Context;
 
 public class RegistrationSteps {
 	
 	private RegistrationPage registrationPage;
+	private LoginPage loginPage;
 	Context context;
 	Map<String, String> data;
 	
@@ -89,10 +93,45 @@ public class RegistrationSteps {
 
 		String expectedErrMsg = data.get("Message").trim();		
 		String actualErrMsg = registrationPage.getErrMsgText();
-		System.out.println("Actual Error Msg Received = " + actualErrMsg);
 		Assert.assertEquals(expectedErrMsg, actualErrMsg);
 	}
 
+	/********************** Register with Valid Data *****************************/
 	
+	@When("User clicks on Register button with valid data")
+	public void user_clicks_on_register_button_with_valid_data() {
+	    
+		String userEmail = "toffee123@gmail.com";
+		String userPassword = "DuubDub$26";
+
+		Register register = new Register.RegisterBuilder()
+				.setFirstName("Tohfa")
+				.setLastName("Nay")
+				.setDob("10101991")
+				.setStreet("124 Street") //
+				.setPostalCode("11211") //
+				.setCity("Brooklyn") //
+				.setState("NY")//
+				.setCountry("US")//
+				.setPhone("9728657789")
+				.setEmail(userEmail)
+				.setPassword(userPassword)
+				.build(); 
+				
+		loginPage =	(LoginPage)registrationPage.enterFormData("Valid", register);
+		
+		
+		  context.setRuntimeData("userEmail",userEmail);
+		  context.setRuntimeData("userPassword",userPassword);
+		  context.setRuntimeData("userInfo",register);
+		
+		
+	}
+	
+	@Then("User is navigated to Login Page")
+	public void user_is_navigated_to_login_page() {
+	    
+		Assert.assertEquals(loginPage.getPageHeaderText(), UIConstants.HEADER_VALUE_LOGINPAGE);
+	}
 	
 }
