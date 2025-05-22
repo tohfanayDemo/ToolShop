@@ -9,7 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import utilities.ElementUtil;
+import utils.ElementUtil;
 
 public abstract class Banner {
 	
@@ -68,6 +68,50 @@ public abstract class Banner {
 		}
 		
 		return pageObj;
+	}
+	
+public Object goToMyPages(String userName, String myPageName) {
+		
+		By userNameBannerOption = By.xpath("//a[normalize-space()='"+userName.trim()+"']");
+		util.doClick(userNameBannerOption);
+		
+		Object pageObj = null;
+		
+		switch (myPageName.trim().toLowerCase()) {
+		case "my account":
+			util.doClick(By.linkText("My account"));
+			pageObj = new MyAccountPage(driver);
+			
+		case "my favorites":
+			util.doClick(By.linkText("My favorites"));
+			//pageObj = new MyFavoritesPage(driver);
+			
+		case "my profile":
+			util.doClick(By.linkText("My profile"));
+			//pageObj = new MyProfilePage(driver);	
+		
+		case "my invoices":
+			util.doClick(By.linkText("My invoices"));
+			//pageObj = new MyInvoicesPage(driver);
+			break;
+			
+		case "my messages":
+			util.doClick(By.linkText("My messages"));
+			//pageObj = new MyMessagesPage(driver);
+			break;
+		
+		case "sign out":
+			util.doClick(By.linkText("Sign out"));
+			pageObj = new HomePage(driver);
+			break;
+			
+		default:
+			System.out.println("My Page Option not found");
+			break;
+		}
+		
+		return pageObj;
+		
 	}
 	
 	public Map<String, Object> getAllCategoriesOptions() {

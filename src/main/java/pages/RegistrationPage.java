@@ -8,7 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import models.Register;
-import utilities.ElementUtil;
+import utils.ElementUtil;
 
 public class RegistrationPage extends Banner {
 
@@ -107,18 +107,16 @@ public class RegistrationPage extends Banner {
 		  
 		  util.doSendKeys(phoneField, register.getPhone().trim());
 		  util.doSendKeys(emailField, register.getEmail().trim());
-		  //util.doSendKeys(passwordField, register.getPassword().trim());
 		  enterPasswordValue(register.getPassword().trim());
 		  
 		  clickRegisterBtn();
 		  
 		  if(validOrInvalid.equalsIgnoreCase("valid")) {
-			  return new AccountPage(driver);
+			  return new LoginPage(driver);
 		  } else return null;
 	  }
 	
-	
-	 
+		 
 
 	public void clickRegisterBtn() {
 		
@@ -149,7 +147,6 @@ public class RegistrationPage extends Banner {
 		
 		String errText = null;
 		if(getEmptyFormErrMsgCount() == 1) {
-			System.out.println("Error text found");
 			WebElement ele = (util.getElement(emptyFormErrMsgs).findElement(By.tagName("div")));
 			errText = util.getElementText(ele);
 		}

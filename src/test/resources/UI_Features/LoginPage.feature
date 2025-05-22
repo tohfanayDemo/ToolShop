@@ -6,11 +6,11 @@ Feature: Login Functionality
 		Given User is on Home Page
 		And User clicks on the "Sign in" banner
 		
-#		@positive
-#		Scenario: Validate login functionality with valid data in all fields
-    #When User enter valid data in all field and clicks login button 
-    #Then User should land on home page 
-#	
+		@positive @test
+	Scenario: Validate login functionality with valid data in all fields
+    When User enters valid data in all field and clicks login button 
+    Then User should land on MyAccount page 
+	
 		@testData
    Scenario Outline: Validate login functionality with invalid data - "<Testcase>"
     When User enters value for "<Testcase>" in email and password field

@@ -11,20 +11,28 @@ import driver.WebDriverManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import models.Register;
+import pages.CheckoutPage;
 import pages.ContactPage;
 import pages.HomePage;
 import pages.LoginPage;
+import pages.ProductPage;
+import utils.Context;
 
 public class HomepageSteps {
 	
+	Context context;
 	Object pageObject;
 	HomePage homePage;
+	ProductPage productPage;
+	CheckoutPage checkoutPage;
 	String bannerOption, searchedProduct, categoryName1, categoryName2, brandName1,brandName2;
 	SoftAssert softAssert;
 	int resultCount;
 
 	
-	public HomepageSteps() {
+	public HomepageSteps(Context context) {
+		this.context = context;
 		homePage = new HomePage(WebDriverManager.getDriver());
 		softAssert = new SoftAssert();
 	}
@@ -164,6 +172,7 @@ public class HomepageSteps {
 	@When("User selects the {string} category checkbox")
 	public void user_selects_the_category_checkbox(String categoryName) {
 		homePage.selectCheckbox(categoryName);
+		context.setRuntimeData("subcategory", categoryName.trim());
 	}
 
 	@Then("User should see only products in the {string} category displayed")
@@ -226,6 +235,8 @@ public class HomepageSteps {
 	@When("User selects the {string} brand checkbox")
 	public void user_selects_the_brand_checkbox(String brandName) {
 		homePage.selectCheckbox(brandName);
+		context.setRuntimeData("brandName", brandName.trim());
+		
 	}
 	
 	
@@ -280,5 +291,88 @@ public class HomepageSteps {
 		Assert.assertEquals(resultCount, resultCountAfterDeselection);
 	}
 	
+	/************************** Complete Customer Flow ***************************/
 	
+	@Then("User clicks {string} image and views product details")
+	public void user_clicks_image_and_views_product_details(String productName) {
+
+		Map<String, Object> obj = homePage.viewProduct(productName.trim());		
+		int productCardPrice = (int) obj.get("productPrice");
+		productPage = (ProductPage)obj.get("pageObj");
+		
+		Map<String,Object> productDetailsFromProductPage = productPage.getProductDetails();
+		softAssert.assertEquals(productName, String.valueOf(productDetailsFromProductPage.get("productName")));
+		softAssert.assertEquals(productCardPrice, (int)productDetailsFromProductPage.get("productPrice"));
+		softAssert.assertEquals(String.valueOf(context.getRuntimeData("subcategory")), String.valueOf(productDetailsFromProductPage.get("subcategory")));
+		softAssert.assertEquals(String.valueOf(context.getRuntimeData("brandName")), String.valueOf(productDetailsFromProductPage.get("brand")));
+		
+		softAssert.assertAll();
+		
+		context.setRuntimeData("productName", productName);
+		context.setRuntimeData("UnitPrice", productCardPrice);
+
+	}
+	
+	@Then("User enters quantity and adds the product to the cart")
+	public void user_enters_quantity_and_adds_the_product_to_the_cart() {
+		
+		int productQuantityOrdered = 2;
+		productPage.setProductQuantity(String.valueOf(productQuantityOrdered));
+		int cartQuantity = productPage.getCartQuantity();
+		Assert.assertTrue(cartQuantity>=productQuantityOrdered);
+		context.setRuntimeData("Quantity", productQuantityOrdered);
+	}
+	
+	@Then("User sees product details in CartPage")
+	public void user_sees_product_details_in_cart_page() {
+
+		checkoutPage = productPage.navigateToCheckoutPage();
+		Map<String, Map<String, Object>> productInfoFromCheckoutPage = checkoutPage.getAllProductInfo();
+		String product = String.valueOf(context.getRuntimeData("productName"));
+		Map<String, Object> info = productInfoFromCheckoutPage.get(product);
+		
+		softAssert.assertEquals((int)context.getRuntimeData("Quantity"), (int)info.get("Quantity"));
+		softAssert.assertEquals((int)context.getRuntimeData("UnitPrice"), (int)info.get("UnitPrice"));
+		softAssert.assertEquals((int)context.getRuntimeData("Quantity")*(int)context.getRuntimeData("UnitPrice"), (int)info.get("ProductTotalPrice"));
+		
+		softAssert.assertAll();
+	}
+	
+	@Then("completes the checkout process")
+	public void completes_the_checkout_process() {
+
+		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
+		
+		//navigates to Signin step
+		Register registeredUserInfo = (Register)context.getRuntimeData("userInfo");
+		String firstName = registeredUserInfo.getFirstName();
+		String lastName = registeredUserInfo.getLastName();
+		String fullName = firstName+" "+lastName;
+		String signedInText = checkoutPage.getSignedInText();
+		softAssert.assertTrue(signedInText.contains(fullName));
+		
+		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
+		
+		//navigates to BillingAddress step
+		Map<String, String> savedBillingInfo = checkoutPage.getBillingAddressInfo();
+		softAssert.assertEquals(registeredUserInfo.getStreet(),savedBillingInfo.get("Street"));
+		softAssert.assertEquals(registeredUserInfo.getCity(),savedBillingInfo.get("City"));
+		softAssert.assertEquals(registeredUserInfo.getState(),savedBillingInfo.get("State"));
+		softAssert.assertEquals(registeredUserInfo.getCountry(),savedBillingInfo.get("Country"));
+		softAssert.assertEquals(registeredUserInfo.getPostalCode(),savedBillingInfo.get("Zipcode"));
+		
+		softAssert.assertAll();
+		
+		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
+		
+		//navigates to Payment step
+		checkoutPage.selectPaymentMethod("Cash on Delivery");
+		checkoutPage.clickCheckoutOrConfirmBtn("Confirm");
+		//Payment was successful
+		Assert.assertEquals(checkoutPage.getPaymentSuccessText(), "Payment was successful");
+		
+		//Sign out
+		homePage = (HomePage)checkoutPage.goToMyPages(fullName, "Sign out");
+		Assert.assertTrue(homePage.doesSearchBoxExist());
+	}
 }

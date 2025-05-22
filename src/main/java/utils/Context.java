@@ -1,16 +1,19 @@
-package utilities;
+package utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Context {
 
 	List<Map<String, String>> testData;
+	Map<String, Object> runtimeDataMap;
 	
 	public Context() {
 		
 		testData = new ArrayList<>();
+		runtimeDataMap = new HashMap<>();
 	}
 
 	public List<Map<String, String>> getTestData() {
@@ -38,5 +41,19 @@ public class Context {
         }
 	}
 	
+	public void setRuntimeData(String key, Object value) {
+		runtimeDataMap.put(key, value);
+	}
+
+	public Object getRuntimeData(String key) {
+		return runtimeDataMap.get(key);
+	}
+	
+	public void emptyRuntimeDataMap() {//tbd
+		if (runtimeDataMap!= null) {
+			runtimeDataMap.clear();
+			System.out.println("Runtime data cleared.");
+		}
+	}
 	
 }
