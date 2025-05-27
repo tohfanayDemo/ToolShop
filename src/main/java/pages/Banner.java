@@ -70,7 +70,7 @@ public abstract class Banner {
 		return pageObj;
 	}
 	
-public Object goToMyPages(String userName, String myPageName) {
+	public Object goToMyPages(String userName, String myPageName) {
 		
 		By userNameBannerOption = By.xpath("//a[normalize-space()='"+userName.trim()+"']");
 		util.doClick(userNameBannerOption);

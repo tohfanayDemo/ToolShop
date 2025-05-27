@@ -16,8 +16,8 @@ import utils.Context;
 
 public class RegistrationSteps {
 	
-	private RegistrationPage registrationPage;
-	private LoginPage loginPage;
+	RegistrationPage registrationPage;
+	LoginPage loginPage;
 	Context context;
 	Map<String, String> data;
 	
@@ -108,11 +108,11 @@ public class RegistrationSteps {
 				.setFirstName("Tohfa")
 				.setLastName("Nay")
 				.setDob("10101991")
-				.setStreet("124 Street") //
-				.setPostalCode("11211") //
-				.setCity("Brooklyn") //
-				.setState("NY")//
-				.setCountry("US")//
+				.setStreet("124 Street") 
+				.setPostalCode("11211") 
+				.setCity("Brooklyn") 
+				.setState("NY")
+				.setCountry("US")
 				.setPhone("9728657789")
 				.setEmail(userEmail)
 				.setPassword(userPassword)
@@ -120,12 +120,10 @@ public class RegistrationSteps {
 				
 		loginPage =	(LoginPage)registrationPage.enterFormData("Valid", register);
 		
-		
-		  context.setRuntimeData("userEmail",userEmail);
+     	  context.setRuntimeData("userEmail",userEmail);
 		  context.setRuntimeData("userPassword",userPassword);
 		  context.setRuntimeData("userInfo",register);
-		
-		
+
 	}
 	
 	@Then("User is navigated to Login Page")

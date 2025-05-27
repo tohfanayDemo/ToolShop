@@ -25,4 +25,5 @@ public class UIConstants {
 
 	/********************* CART PAGE **********************/
 	public static final List<String> COLUMN_HEADERS_CARTPAGE = Arrays.asList("Item","Quantity","Price","Total"); 
+	public static final String PAYMENT_SUCCESSFUL_TEXT = "Payment was successful"; 
 }

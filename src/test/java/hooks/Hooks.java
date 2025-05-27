@@ -1,50 +1,54 @@
 package hooks;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
-
-import org.openqa.selenium.WebDriver;
+import java.util.Properties;
 
 import driver.WebDriverManager;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
 import io.cucumber.java.After;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.Scenario;
+
+import io.qameta.allure.Allure;
+import utils.ConfigReader;
 import utils.Context;
 import utils.ExcelReader;
+import utils.TestContextManager;
 
 
 public class Hooks {
 
 	WebDriver driver;
 	WebDriverManager driverManager;
-	Context context;
+	//Context context;
+	Properties prop;
 	
-	public Hooks(Context context) {
-		this.context = context;
+	public Hooks(/*Context context*/) {
+		//this.context = context;
 	}
 	
 	@BeforeAll
 	public static void externalFIleOrAppSetUp() throws Exception {
 
 		String excelPath = System.getProperty("user.dir") + "\\src\\test\\resources\\testData\\testdata.xlsx";
-		System.out.println("Excel file path = " + excelPath);
 		if (excelPath != null) {
 
 			ExcelReader.openExcel(excelPath);
-			System.out.println("Excel file opened successfully.");
-		} /*
-			 * else System.out.println("No excel path found");
-			 */
+		} 
 	}
        
 	@Before("@testData")
 	public void testDataSetup(Scenario scenario) {
 		
-	    // Get all tags
+		Context context = TestContextManager.getContext();
 		Collection<String> allTags = scenario.getSourceTagNames();
-		//System.out.println("All tags in this scenario = " + allTags);
 		
 		for(String tagName: allTags) {
 			String scenarioTagName = tagName.trim().toLowerCase();
@@ -65,28 +69,38 @@ public class Hooks {
 	    
 	}
 	
+	
 	@Before()
-	public void chromeSetUp() {
-		System.out.println("I am in chrome before scenario");
-		String browser = "chrome";
+	public void setup() {
+		System.out.println("I am in setup before scenario");
 		driverManager = new WebDriverManager();
-		driver = driverManager.initDriver(browser);
-		driver.get("https://practicesoftwaretesting.com");
+		prop = driverManager.initProp();
+		driver = driverManager.initDriver(prop,ConfigReader.getBrowserFromTestNG());
+		
 	}
 	
 	@After
-	public void quitBrowser() {
+	public void tearDown(Scenario scenario) {
+		
+		if (scenario.isFailed()) {
+			final byte[] screenshot = ((TakesScreenshot) WebDriverManager.getDriver()).getScreenshotAs(OutputType.BYTES);
+			scenario.attach(screenshot, "image/png", "Myscreenshot");
+			Allure.addAttachment("Myscreenshot",
+					new ByteArrayInputStream(((TakesScreenshot) WebDriverManager.getDriver()).getScreenshotAs(OutputType.BYTES)));
+		}
+		
 		WebDriverManager.quitBrowser();
+		Context context = TestContextManager.getContext();
 		context.emptyDataMap();
+		context.emptyRuntimeDataMap();
+		TestContextManager.removeContext(); // Cleanup thread-local contex
 	}
 	
 	@AfterAll
 	public static void externalFIleOrAppTearDown() {
 		try {
-			
 			// Close the Excel file
 			ExcelReader.closeExcel();
-			System.out.println("Excel file closed successfully.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -18,6 +18,7 @@ import pages.HomePage;
 import pages.LoginPage;
 import pages.ProductPage;
 import utils.Context;
+import utils.TestContextManager;
 
 public class HomepageSteps {
 	
@@ -31,8 +32,8 @@ public class HomepageSteps {
 	int resultCount;
 
 	
-	public HomepageSteps(Context context) {
-		this.context = context;
+	public HomepageSteps() {
+		context = TestContextManager.getContext();
 		homePage = new HomePage(WebDriverManager.getDriver());
 		softAssert = new SoftAssert();
 	}
@@ -72,15 +73,6 @@ public class HomepageSteps {
 	@Then("User should see a drop down list with {int} options")
 	public void user_should_see_a_drop_down_list_with_options(Integer optionCount) {
 		
-		/*
-		 * System.out.println((Integer)homePage.getAllCategoriesOptions().get("Count"));
-		 * System.out.println(homePage.getAllCategoriesOptions().get("List"));
-		 * System.out.println(homePage.getAllCategoriesOptions().get("List").getClass().
-		 * getSimpleName()); System.out.println(UIConstants.EXPECTED_CATEGORY_NAMES);
-		 * System.out.println(UIConstants.EXPECTED_CATEGORY_NAMES.getClass().
-		 * getSimpleName()); //ArrayList
-		 */
-
 		switch (bannerOption.trim()) {
 		
 		case "Categories":
@@ -318,8 +310,10 @@ public class HomepageSteps {
 		
 		int productQuantityOrdered = 2;
 		productPage.setProductQuantity(String.valueOf(productQuantityOrdered));
+		
 		int cartQuantity = productPage.getCartQuantity();
 		Assert.assertTrue(cartQuantity>=productQuantityOrdered);
+		
 		context.setRuntimeData("Quantity", productQuantityOrdered);
 	}
 	
@@ -340,20 +334,20 @@ public class HomepageSteps {
 	
 	@Then("completes the checkout process")
 	public void completes_the_checkout_process() {
-
+		
+		//Step1: CartPage
 		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
 		
-		//navigates to Signin step
+		//Step2: Sign-in step
 		Register registeredUserInfo = (Register)context.getRuntimeData("userInfo");
-		String firstName = registeredUserInfo.getFirstName();
-		String lastName = registeredUserInfo.getLastName();
-		String fullName = firstName+" "+lastName;
+		String fullName = registeredUserInfo.getFirstName()+" "+registeredUserInfo.getLastName();
 		String signedInText = checkoutPage.getSignedInText();
+		
 		softAssert.assertTrue(signedInText.contains(fullName));
 		
 		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
 		
-		//navigates to BillingAddress step
+		//Step3: BillingAddress step
 		Map<String, String> savedBillingInfo = checkoutPage.getBillingAddressInfo();
 		softAssert.assertEquals(registeredUserInfo.getStreet(),savedBillingInfo.get("Street"));
 		softAssert.assertEquals(registeredUserInfo.getCity(),savedBillingInfo.get("City"));
@@ -365,11 +359,11 @@ public class HomepageSteps {
 		
 		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
 		
-		//navigates to Payment step
+		//Step4: Payment step
 		checkoutPage.selectPaymentMethod("Cash on Delivery");
 		checkoutPage.clickCheckoutOrConfirmBtn("Confirm");
 		//Payment was successful
-		Assert.assertEquals(checkoutPage.getPaymentSuccessText(), "Payment was successful");
+		Assert.assertEquals(checkoutPage.getPaymentSuccessText(), UIConstants.PAYMENT_SUCCESSFUL_TEXT);
 		
 		//Sign out
 		homePage = (HomePage)checkoutPage.goToMyPages(fullName, "Sign out");

@@ -13,6 +13,7 @@ import driver.WebDriverManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import pages.HomePage;
 import pages.LoginPage;
 import pages.MyAccountPage;
 import pages.RegistrationPage;
@@ -20,12 +21,13 @@ import utils.Context;
 
 public class LoginSteps {
 	
-	private Context context;
-	private WebDriver driver;
-	private LoginPage loginPage;
-	private MyAccountPage myAccountPage;
-	private List<String> actualErrMsgList;
-	private RegistrationPage registrationPage;
+	Context context;
+	WebDriver driver;
+	HomePage homePage;
+	LoginPage loginPage;
+	MyAccountPage myAccountPage;
+	List<String> actualErrMsgList;
+	RegistrationPage registrationPage;
 	Map<String, String> data;
 
 	public LoginSteps(Context context) {
@@ -41,19 +43,18 @@ public class LoginSteps {
 	@When("User enters valid data in all field and clicks login button")
 	public void user_enters_valid_data_in_all_field_and_clicks_login_button() {
 		
-		/*
-		 * System.out.println("Useremail = " + context.getRuntimeData("userEmail"));
-		 * System.out.println("userPassword = " +
-		 * context.getRuntimeData("userPassword"));
-		 */
 		myAccountPage = loginPage.validLogin(String.valueOf(context.getRuntimeData("userEmail")), String.valueOf(context.getRuntimeData("userPassword")));
-		//myAccountPage = loginPage.validLogin("tofee123@gmail.com", "DuubDub$26");
 	}
 	
 	@Then("User should land on MyAccount page")
 	public void user_should_land_on_MyAccount_page() {
 		
 		assertEquals(myAccountPage.getPageHeaderText(), UIConstants.HEADER_VALUE_MYACCOUNTPAGE);
+	}
+	
+	@When("User clicks the {string} banner from MyAccount Page")
+	public void user_clicks_the_banner_from_my_account_page(String bannerOption) {
+		homePage = (HomePage)myAccountPage.clickOnBannerOption(bannerOption.trim());
 	}
 	
 	/*********************** Validate login functionality with null user name ***************/

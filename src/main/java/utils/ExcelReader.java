@@ -22,10 +22,9 @@ public class ExcelReader {
 	private static Workbook workbook;
     private static FileInputStream fis;
 
-	// Method to open the Excel file
     public static void openExcel(String filePath) throws IOException {
-        fis = new FileInputStream(new File(filePath));  // Open the file
-        workbook = new XSSFWorkbook(fis);                // Create workbook object
+        fis = new FileInputStream(new File(filePath));  
+        workbook = new XSSFWorkbook(fis);                
     }
     
     public static List<Map<String, String>> getExcelData(String sheetName) {
@@ -55,13 +54,13 @@ public class ExcelReader {
         return dataList;
     }
     
-    // Method to close the workbook and file input stream
+    
     public static void closeExcel() throws IOException {
         if (workbook != null) {
-            workbook.close();  // Close workbook
+            workbook.close();  
         }
         if (fis != null) {
-            fis.close();  // Close file input stream
+            fis.close();  
         }
     }
 
