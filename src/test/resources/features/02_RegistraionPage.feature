@@ -1,5 +1,5 @@
-#Author: Tohfatul
-@registration
+@Author_Tohfatul
+@registration @unit
 Feature: Registration Functionality
 
 Background:
@@ -11,10 +11,10 @@ Background:
 		When User clicks on Register button without filling up form
 		Then User sees error msg for each field
 	
-#	@registration_valid
- #	Scenario: User registers with valid data
- #		When User clicks on Register button with valid data
- #		Then User is navigated to Login Page	
+	
+ 	Scenario: User registers with valid data
+ 		When User clicks on Register button with valid data
+ 		Then User is navigated to Login Page	
 		
 	@testData
 	Scenario Outline: Password fulfilling "<Testcase>" shows "<Level>" password strength
@@ -28,7 +28,7 @@ Background:
     |4Conditions_Lower&Uppercase&Number&SpecialChar      |Very Strong|
     |5Conditions_Lower&Uppercase&Number&SpecialChar&8Char|Excellent  |
     
-  @testData @wip
+  @testData
 	Scenario Outline: Validate Registration functionality for scenario "<Testcase>" with invalid data
 	  When User enters for data in form for scenario "<Testcase>"
 	  Then User should see error message

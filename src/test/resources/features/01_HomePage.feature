@@ -1,6 +1,5 @@
-#Author: Tohfatul
-
-@Home
+@Author_Tohfatul
+@Home @unit
 Feature: Homepage Functionality
 
   	Background:
@@ -8,7 +7,7 @@ Feature: Homepage Functionality
 
 ####################### BANNER #################################
 
-	@Banner
+	@Banner @smoke
 	Scenario Outline: User clicks on "<Option>" banner option and lands on "<Page>"
 	  When User clicks on the "<Option>" banner
 	  Then User lands on "<Page>"
@@ -30,7 +29,7 @@ Feature: Homepage Functionality
 
 ####################### SORTING #################################
     
-  @Sort
+  @Sort @smoke
 	Scenario Outline: User sort product based on "<DropdownOption>"
 	  When User selects "<DropdownOption>" from the sort dropdown
 	  Then User should see products displayed in "<Order>"
@@ -62,7 +61,7 @@ Feature: Homepage Functionality
       
       
  ####################### SEARCH BOX #################################
-   @search
+   @search @smoke
    Scenario: User searches for a product
 	  When User enters "plier" in the search box and clicks the search button
 	  Then User should see a list of products matching "plier"   

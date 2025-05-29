@@ -12,30 +12,45 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 import logger.Log;
 
-public class WebDriverManager {
-	
-	WebDriver driver;
+public class DriverFactory {
+
 	Properties prop;
-	
+	static String testNGBrowserType = null;
 	private static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<>();
+
+	public void setTestNGBrowserType(String browser) {
+		testNGBrowserType = browser;
+	}
+
+	public static String getTestNGBrowserType() {
+		return testNGBrowserType;
+	}
 	
-	public WebDriver initDriver(Properties prop, String testNGBrowser) {
+	public WebDriver initDriver(Properties prop) {
 		
-		//Choose source of browser value
-		String browser = null;
-		String envBrowser = System.getProperty("browser");
+		// Choose source of browser value
+		String browser,envBrowser,testNGBrowser,propBrowser;
+		browser = null;
+		envBrowser = System.getProperty("browser");
+		testNGBrowser = getTestNGBrowserType();
+		propBrowser = prop.getProperty("browser");
 		
-		if(envBrowser != null) {//1st priority env value
+		System.out.println("=======================================================");
+		System.out.println();
+		System.out.println("Inside WEBDRIVER CLASS");
+		System.out.println("Value of Browser from TestNG.xml = " + testNGBrowser);
+		System.out.println();
+		System.out.println("=======================================================");
+
+		if (envBrowser != null) {// 1st priority env value
 			browser = envBrowser;
-		}
-		else if(testNGBrowser != null) {//2nd priority testNG value
+		} else if (testNGBrowser != null) {// 2nd priority testNG value
 			browser = testNGBrowser;
+		} else {// default properties file value
+			browser = propBrowser;
 		}
-		else {//default properties file value
-			browser = prop.getProperty("browser");
-		}
-		
-		
+
+		System.out.println("BROWSER TO BE SET (INSIDE WEBDRIVER CLASS)= " + testNGBrowser);
 		switch (browser.toLowerCase().trim()) {
 		case "chrome":
 			tlDriver.set(new ChromeDriver());
@@ -45,30 +60,29 @@ public class WebDriverManager {
 			break;
 		case "edge":
 			tlDriver.set(new EdgeDriver());
-			break;	
+			break;
 		default:
 			throw new IllegalArgumentException("Unsupported browser: " + browser);
 		}
-		
+
 		getDriver().manage().window().maximize();
 		getDriver().manage().deleteAllCookies();
 		getDriver().get(prop.getProperty("url"));
-		
+
 		return getDriver();
 	}
-	
 
 	public static WebDriver getDriver() {
 		return tlDriver.get();
 	}
-	
+
 	public static void quitBrowser() {
-		if(tlDriver.get() != null) {
+		if (tlDriver.get() != null) {
 			tlDriver.get().quit();
 			tlDriver.remove();
 		}
 	}
-	
+
 	public Properties initProp() {
 		prop = new Properties();
 		FileInputStream ip = null;
@@ -94,14 +108,10 @@ public class WebDriverManager {
 				case "uat":
 					ip = new FileInputStream("./src/test/resources/config/uat.config.properties");
 					break;
-				case "prod":
-					ip = new FileInputStream("./src/test/resources/config/prod.config.properties");
-					break;
 
 				default:
 					Log.error("plz pass the right env name..." + envName);
 					throw new IllegalArgumentException("INVALID ENV NAME");
-					//throw new FrameworkException("INVALID ENV NAME");
 				}
 			}
 

@@ -1,11 +1,8 @@
 package utils;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -276,7 +273,7 @@ public class ElementUtil {
     }
 
 	public String getAttributeVal(By locator, String attributeName) {
-		return elementWithFluentWaitLocated(locator, 10, 100).getAttribute(attributeName);
+		return elementWithFluentWaitLocated(locator, 10, 100).getDomAttribute(attributeName);
 	}
 
 	public void attachFileUsingSendKeys(By locator, String filePath) {
@@ -286,19 +283,6 @@ public class ElementUtil {
 
 		}
 	}
-	
-	// Method to check if a field is editable
-    public boolean isFieldEditable(By locator) {
-        WebElement element = driver.findElement(locator);
-        try {
-            // Try to send keys and catch exception if it is not editable
-            element.sendKeys("test");  // Attempt to type something
-            element.clear();           // Clear after testing
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
 	public void scrollToBottomOfPage() {
 		Actions action = new Actions(driver);
@@ -331,7 +315,7 @@ public class ElementUtil {
 
 	}
 	
-	public boolean isEditablefield(By locator) {
+	public boolean isFieldEditable(By locator) {
         WebElement editableElement = getElement(locator);
 		JavascriptExecutor js = (JavascriptExecutor) driver;
         Boolean isContentEditable = (Boolean) js.executeScript("return arguments[0].isContentEditable;", editableElement);
@@ -373,17 +357,15 @@ public class ElementUtil {
 		.keyUp(Keys.ENTER)
         .perform();
 	}
-
 	
-	public String getAlertMsg() {
+	 public void pressKey(WebDriver driver, Keys key) {
+	        // Initialize Actions class
+	        Actions actions = new Actions(driver);
 
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-		if (!(wait.until(ExpectedConditions.alertIsPresent()) == null)) {
-			alert = driver.switchTo().alert();
-			return alert.getText();
-		} else
-			return "Alert is not present";
-	}
+	        // Perform the key press action
+	        actions.sendKeys(key).perform();
+	 }
+
 
 	public void clickElementByJS(By locator, WebDriver driver) {
 		try {
@@ -391,7 +373,6 @@ public class ElementUtil {
 			JavascriptExecutor js = ((JavascriptExecutor) driver);
 			js.executeScript("arguments[0].click();", getElement(locator));
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -403,107 +384,17 @@ public class ElementUtil {
 		return getElement(locator).isEnabled();
 	}
 	
-	public static boolean validator(String actual, String expected) {
-
-		if(actual.equalsIgnoreCase(expected)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
 
 	public boolean isElementPresent(By locator) {
 		try {
 			driver.findElement(locator);
             return true;
 		} catch (Exception e) {
-			// TODO: handle exception
             return false;
 
 		}
         
     }
-	
-	public List<String> printWebElements(List<WebElement> options) {
-
-		List<String> texts = new ArrayList<String>();
-		int i=0;
-		for(WebElement option: options) {
-			texts.add(i,option.getText());
-			i++;
-		}
-		//LoggerLoad.info("The number of items in the list are: "+ texts.size());
-		return texts;
-	}
-	
-	public ArrayList<Integer> printWebElementsNC(ArrayList<WebElement> options) {
-
-		ArrayList<Integer> integ = new ArrayList<Integer>();
-		int i=0;
-		for(WebElement option: options) {
-			String variable = option.getText();
-			int Num = Integer.parseInt(variable);
-			integ.add(i, Num);
-			i++;
-		}
-		return integ;
-	}
-	
-	public ArrayList<WebElement> getElementsint(By locator) {
-		return (ArrayList<WebElement>) driver.findElements(locator);
-	}
-	
-	public List<String> getSortedList(List<String> originalList){
-		
-        List<String> sortedList = new ArrayList<>(originalList);
-        return sortedList;
-	}
-	
-	public ArrayList<Integer> getSortedNCList(ArrayList<Integer> originalNCList){
-		
-        ArrayList<Integer> sortedList = new ArrayList<>(originalNCList);
-        Collections.sort(sortedList);
-        return sortedList;
-	}
-	
-	public List<String> getSortedListDescending(List<String> originalList){
-		
-		//LoggerLoad.info("Original List Before sorting is"+ originalList);
-        List<String> sortedList = new ArrayList<>(originalList);
-     //   Collections.sort(originalList, (s1, s2) -> s2.compareToIgnoreCase(s1));
-		//LoggerLoad.info("Sorted List After sorting is"+ sortedList);
-        return sortedList;
-	}
-	
-	public ArrayList<Integer> getSortedListNCDescending(ArrayList<Integer> originalNCList){
-		
-		//LoggerLoad.info("Original List Before sorting is"+ originalNCList);
-        ArrayList<Integer> sortedList = new ArrayList<>(originalNCList);
-     //   Collections.sort(originalNCList, (s1, s2) -> s2.compareTo(s1));
-		//LoggerLoad.info("Sorted List After sorting is"+ originalNCList);
-        return sortedList;
-	}
-
-	public  String getRandomNumbers(int length) {
-		 StringBuilder result = new StringBuilder();
-	        Random random = new Random();
-
-	        for (int i = 0; i < length; i++) {
-	            int digit = random.nextInt(10); // Generates a random number between 0 and 9
-	            result.append(digit);
-	        }
-	        return result.toString();
-	    
-    }
-	
-	 public void pressKey(WebDriver driver, Keys key) {
-	        // Initialize Actions class
-	        Actions actions = new Actions(driver);
-
-	        // Perform the key press action
-	        actions.sendKeys(key).perform();
-	 }
 
 	 public void getPageLoadStatus() {
 		 
@@ -531,18 +422,5 @@ public class ElementUtil {
 
 
 	 }
-	 
-	 public String generateRandomString(int length) {
-			String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
-			Random random = new Random();
-			StringBuilder result = new StringBuilder(length);
-
-			for (int i = 0; i < length; i++) {
-				int index = random.nextInt(characters.length());
-				result.append(characters.charAt(index));
-			}
-
-			return result.toString().toLowerCase();
-		}
 	 
 }

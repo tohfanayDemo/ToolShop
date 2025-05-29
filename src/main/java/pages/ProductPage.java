@@ -1,12 +1,10 @@
 package pages;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import models.Product;
 import utils.ElementUtil;
 
 public class ProductPage extends Banner{
@@ -19,6 +17,7 @@ public class ProductPage extends Banner{
 	private By subcategory = By.xpath("//*[@aria-label='brand']");
 	private By brand = By.xpath("//*[@aria-label='brand']");
 	private By price = By.xpath("//span[@data-test='unit-price']");
+	private By details = By.xpath("//p[@id='description']");
 	private By decreaseBtn = By.id("btn-decrease-quantity");
 	private By increaseBtn = By.id("btn-increase-quantity");
 	private By quantity = By.id("quantity-input");
@@ -72,15 +71,30 @@ public class ProductPage extends Banner{
 		return productStatus;
 	}
 	
-	public Map<String,Object> getProductDetails() {
+	public Product getProductDetails() {
 		
-		Map<String,Object> productInfo = new HashMap<String,Object>();
-		productInfo.put("productName", util.getElementText(productName).trim());
-		productInfo.put("subcategory", util.getElementText(subcategory).trim());
-		productInfo.put("brand", util.getElementText(brand).trim());
+		Product product = new Product();
+		
+		//set name
+		product.setName(util.getElementText(productName).trim());
+		//set price
 		String[] price = util.getElementText(this.price).trim().split("$");
-		productInfo.put("productPrice", Integer.parseInt(price[1])); 
-		
-		return productInfo;
+		product.setPrice(Integer.parseInt(price[1]));
+		//set brand
+		product.setBrand(util.getElementText(brand).trim());
+		//set sub-category
+		product.setSubCategory(util.getElementText(subcategory).trim());
+		//set details
+		product.setDetails(util.getElementText(details).trim());
+		//set availability
+		if(util.isElementPresent(availabilityStatus)) {
+			product.setAvailable(true);
+		}
+		else {
+			product.setAvailable(false);
+		}
+
+				
+		return product;
 	}
 }

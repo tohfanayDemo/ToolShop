@@ -13,6 +13,13 @@ public class Retry implements IRetryAnalyzer {
         if (!iTestResult.isSuccess()) {//if not successful
             if (count.get() < maxTry) {
                 count.set(count.get() + 1);
+                
+                System.out.println("====================================");
+                System.out.println();
+                System.out.println("Retry being initialized");
+                System.out.println();
+                System.out.println("====================================");
+                
                 return true;
             }
         }

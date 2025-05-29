@@ -25,5 +25,4 @@
 		<listener class-name="listeners.AnnotationTransformer"></listener>
 	</listeners>
     
-    
 </suite>

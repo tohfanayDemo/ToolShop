@@ -1,59 +1,46 @@
 package utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Context {
 
-	List<Map<String, String>> testData;
-	Map<String, Object> runtimeDataMap;
-	
-	public Context() {
-		
-		testData = new ArrayList<>();
-		runtimeDataMap = new HashMap<>();
-	}
+    private Map<String, Object> runtimeDataMap;
 
-	public List<Map<String, String>> getTestData() {
-		return testData;
-	}
+    public Context() {
+        runtimeDataMap = new HashMap<>();
+    }
 
-	public void setTestData(List<Map<String, String>> testData) {
-		this.testData = testData;
-	}
-	
-	public Map<String, String> getTestDataForTestCase(String testCase) {
-        List<Map<String, String>> dataList = getTestData();
-        for (Map<String, String> data : dataList) {
+    // Scenario runtime data
+    public void setRuntimeData(String key, Object value) {
+        runtimeDataMap.put(key, value);
+    }
+
+    public Object getRuntimeData(String key) {
+        return runtimeDataMap.get(key);
+    }
+
+    public void emptyRuntimeDataMap() {
+        runtimeDataMap.clear();
+        System.out.println("Runtime data cleared.");
+    }
+    
+    /*
+     * public Map<String, String> getTestDataForTestCase(String testCase) {
+        return testData.stream()
+                       .filter(data -> testCase.equalsIgnoreCase(data.get("Testcase")))
+                       .findFirst()
+                       .orElse(null);
+    }
+     * */
+    
+    public Map<String, String> getTestDataForTestCase(List<Map<String, String>> testData, String testCase) {
+        for (Map<String, String> data : testData) {
             if (data.get("Testcase").equalsIgnoreCase(testCase)) {
                 return data;
             }
         }
-        return null; 
+        return null;
     }
-	
-	public void emptyDataMap() {
-		if (getTestData() != null) {
-			getTestData().clear();  //removes all the maps from the list. The List object itself remains, but it's now empty.
-            System.out.println("Test data cleared.");
-        }
-	}
-	
-	public void setRuntimeData(String key, Object value) {
-		runtimeDataMap.put(key, value);
-	}
-
-	public Object getRuntimeData(String key) {
-		return runtimeDataMap.get(key);
-	}
-	
-	public void emptyRuntimeDataMap() {//tbd
-		if (runtimeDataMap!= null) {
-			runtimeDataMap.clear();
-			System.out.println("Runtime data cleared.");
-		}
-	}
-	
 }

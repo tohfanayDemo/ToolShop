@@ -3,7 +3,7 @@ package constants;
 import java.util.Arrays;
 import java.util.List;
 
-public class UIConstants {
+public class Constants {
 
 	/********************* HOME PAGE **********************/
 	public static final String EXPECTED_URL_VALUE_HOMEPAGE = "https://practicesoftwaretesting.com/"; 
@@ -26,4 +26,11 @@ public class UIConstants {
 	/********************* CART PAGE **********************/
 	public static final List<String> COLUMN_HEADERS_CARTPAGE = Arrays.asList("Item","Quantity","Price","Total"); 
 	public static final String PAYMENT_SUCCESSFUL_TEXT = "Payment was successful"; 
+	
+	
+	/********************* FRAMEWORK CONSTANTS **********************/
+	
+	public static final String EXCEL_FILE_PATH = "\\src\\test\\resources\\testData\\testdata.xlsx";
+	public static final String REGISTRATION_EXCEL_SHEET_NAME = "Registration";
+    public static final String LOGIN_EXCEL_SHEET_NAME = "Login";
 }

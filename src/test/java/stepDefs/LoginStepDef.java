@@ -4,52 +4,69 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 
-import constants.UIConstants;
-import driver.WebDriverManager;
+import constants.Constants;
+import driver.DriverFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import models.Register;
 import pages.HomePage;
 import pages.LoginPage;
 import pages.MyAccountPage;
 import pages.RegistrationPage;
 import utils.Context;
+import utils.GlobalContext;
+import utils.TestContextManager;
 
-public class LoginSteps {
+public class LoginStepDef {
 	
-	Context context;
-	WebDriver driver;
+	
+	GlobalContext globalContext = GlobalContext.getInstance(); // ✅ Singleton access
+	Context context = TestContextManager.getContext(); // ✅ Thread-local
+	Properties prop;
 	HomePage homePage;
 	LoginPage loginPage;
 	MyAccountPage myAccountPage;
-	List<String> actualErrMsgList;
 	RegistrationPage registrationPage;
+	
+	List<String> actualErrMsgList;
 	Map<String, String> data;
+	List<Map<String, String>> testDataTable;
 
-	public LoginSteps(Context context) {
-		this.context = context;
-		loginPage = new LoginPage(WebDriverManager.getDriver());
+	public LoginStepDef() {
+		loginPage = new LoginPage(DriverFactory.getDriver());
+		testDataTable = (List<Map<String, String>>) globalContext.getGlobalData("loginTestDataTable");
 	}
 
 	@Given("User is on Login Page")
 	public void user_is_on_login_page() {
-		Assert.assertTrue(loginPage.getPageURL().contains(UIConstants.PARTIAL_URL_VALUE_LOGINPAGE));
+		Assert.assertTrue(loginPage.getPageURL().contains(Constants.PARTIAL_URL_VALUE_LOGINPAGE));
 	}
 	
 	@When("User enters valid data in all field and clicks login button")
 	public void user_enters_valid_data_in_all_field_and_clicks_login_button() {
 		
-		myAccountPage = loginPage.validLogin(String.valueOf(context.getRuntimeData("userEmail")), String.valueOf(context.getRuntimeData("userPassword")));
+		String registeredEmail =((Register)globalContext.getGlobalData("userInfo")).getEmail();
+		String registeredPassword = ((Register)globalContext.getGlobalData("userInfo")).getPassword();
+		
+		if((registeredEmail==null || registeredEmail.isEmpty()) || (registeredPassword==null || registeredPassword.isEmpty())) {
+			
+			prop = (Properties)globalContext.getGlobalData("propertiesObject");
+			registeredEmail = prop.getProperty("email");
+			registeredPassword = prop.getProperty("password");
+		}
+		
+		myAccountPage = loginPage.validLogin(registeredEmail, registeredPassword);
 	}
 	
 	@Then("User should land on MyAccount page")
 	public void user_should_land_on_MyAccount_page() {
 		
-		assertEquals(myAccountPage.getPageHeaderText(), UIConstants.HEADER_VALUE_MYACCOUNTPAGE);
+		assertEquals(myAccountPage.getPageHeaderText(), Constants.HEADER_VALUE_MYACCOUNTPAGE);
 	}
 	
 	@When("User clicks the {string} banner from MyAccount Page")
@@ -108,15 +125,21 @@ public class LoginSteps {
 	@Then("User is navigated to Registration Page")
 	public void user_is_navigated_to_registration_page() {
 		
-		Assert.assertTrue(registrationPage.getPageURL().contains(UIConstants.PARTIAL_URL_VALUE_REGISTRATIONPAGE));
+		Assert.assertTrue(registrationPage.getPageURL().contains(Constants.PARTIAL_URL_VALUE_REGISTRATIONPAGE));
 	}
 	
 	/******************* Login with Invalid Data *********************/
 	
 	@When("User enters value for {string} in email and password field")
-	public void user_enters_value_for_in_email_and_password_field(String Testcase) {
+	public void user_enters_value_for_in_email_and_password_field(String testCase) {
 		
-		data = context.getTestDataForTestCase(Testcase.trim());
+		data = context.getTestDataForTestCase(testDataTable, testCase.trim());
+		System.out.println("=================================================");
+	    for (Map.Entry<String, String> entry : data.entrySet()) {
+	        System.out.println(entry.getKey() + " = " + entry.getValue());
+	    }
+	    System.out.println("=================================================");
+
 		actualErrMsgList = loginPage.invalidLogin(data.get("Username"), data.get("Password"));
 	}
 	

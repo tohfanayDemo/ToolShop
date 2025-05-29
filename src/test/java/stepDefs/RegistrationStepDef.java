@@ -1,29 +1,38 @@
 package stepDefs;
 
+import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
 
-import constants.UIConstants;
+import constants.Constants;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import driver.WebDriverManager;
+import driver.DriverFactory;
 import models.Register;
 import pages.LoginPage;
 import pages.RegistrationPage;
 import utils.Context;
+import utils.DynamicDataGenerator;
+import utils.GlobalContext;
+import utils.TestContextManager;
 
-public class RegistrationSteps {
+public class RegistrationStepDef {
+	
+	GlobalContext globalContext = GlobalContext.getInstance(); 
+	Context context = TestContextManager.getContext(); 
 	
 	RegistrationPage registrationPage;
 	LoginPage loginPage;
-	Context context;
-	Map<String, String> data;
 	
-	public RegistrationSteps(Context context){
-		this.context = context;
-		registrationPage = new RegistrationPage(WebDriverManager.getDriver());
+	Map<String, String> data;
+	List<Map<String, String>> testDataTable;
+	
+	
+	public RegistrationStepDef(){
+		registrationPage = new RegistrationPage(DriverFactory.getDriver());
+		testDataTable = (List<Map<String, String>>) globalContext.getGlobalData("registrationTestDataTable");
 	}
 	
 	/********************** Empty Form *****************************/
@@ -47,9 +56,17 @@ public class RegistrationSteps {
 	/********************** Password Strength *****************************/
 	
 	@When("User enters value for {string} in password field")
-	public void user_enters_value_for_in_password_field(String testName) {
+	public void user_enters_value_for_in_password_field(String testCase) {
+		
+		
+	    data = context.getTestDataForTestCase(testDataTable,testCase.trim());
+	    
+	    System.out.println("=================================================");
+	    for (Map.Entry<String, String> entry : data.entrySet()) {
+	        System.out.println(entry.getKey() + " = " + entry.getValue());
+	    }
+	    System.out.println("=================================================");
 
-	    Map<String, String> data = context.getTestDataForTestCase(testName);
 	    registrationPage.enterPasswordValue(data.get("Password"));
 	}
 	
@@ -66,7 +83,7 @@ public class RegistrationSteps {
 	@When("User enters for data in form for scenario {string}")
 	public void user_enters_for_data_in_form_for_scenario(String testCase) {
 
-		data = context.getTestDataForTestCase(testCase.trim());
+		data = context.getTestDataForTestCase(testDataTable, testCase.trim());
 		
 		//build register object
 		Register register = new Register.RegisterBuilder()
@@ -101,8 +118,8 @@ public class RegistrationSteps {
 	@When("User clicks on Register button with valid data")
 	public void user_clicks_on_register_button_with_valid_data() {
 	    
-		String userEmail = "toffee123@gmail.com";
-		String userPassword = "DuubDub$26";
+		String userEmail = "toffee"+DynamicDataGenerator.getRandomNumberWithin(999)+"@gmail.com";
+		String userPassword = "DuubDub$26" + DynamicDataGenerator.getRandomNumberWithin(99);
 
 		Register register = new Register.RegisterBuilder()
 				.setFirstName("Tohfa")
@@ -119,17 +136,15 @@ public class RegistrationSteps {
 				.build(); 
 				
 		loginPage =	(LoginPage)registrationPage.enterFormData("Valid", register);
-		
-     	  context.setRuntimeData("userEmail",userEmail);
-		  context.setRuntimeData("userPassword",userPassword);
-		  context.setRuntimeData("userInfo",register);
+
+		globalContext.setGlobalData("userInfo",register);
 
 	}
 	
 	@Then("User is navigated to Login Page")
 	public void user_is_navigated_to_login_page() {
 	    
-		Assert.assertEquals(loginPage.getPageHeaderText(), UIConstants.HEADER_VALUE_LOGINPAGE);
+		Assert.assertEquals(loginPage.getPageHeaderText(), Constants.HEADER_VALUE_LOGINPAGE);
 	}
 	
 }

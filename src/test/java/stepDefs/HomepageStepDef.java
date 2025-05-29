@@ -6,11 +6,12 @@ import java.util.Map;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 
-import constants.UIConstants;
-import driver.WebDriverManager;
+import constants.Constants;
+import driver.DriverFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import models.Product;
 import models.Register;
 import pages.CheckoutPage;
 import pages.ContactPage;
@@ -18,29 +19,32 @@ import pages.HomePage;
 import pages.LoginPage;
 import pages.ProductPage;
 import utils.Context;
+import utils.GlobalContext;
 import utils.TestContextManager;
 
-public class HomepageSteps {
+public class HomepageStepDef {
 	
-	Context context;
+	GlobalContext globalContext = GlobalContext.getInstance(); // ✅ Singleton access
+	Context context = TestContextManager.getContext(); // ✅ Thread-local
+	
 	Object pageObject;
 	HomePage homePage;
 	ProductPage productPage;
 	CheckoutPage checkoutPage;
+	
 	String bannerOption, searchedProduct, categoryName1, categoryName2, brandName1,brandName2;
 	SoftAssert softAssert;
 	int resultCount;
 
 	
-	public HomepageSteps() {
-		context = TestContextManager.getContext();
-		homePage = new HomePage(WebDriverManager.getDriver());
+	public HomepageStepDef() {
+		homePage = new HomePage(DriverFactory.getDriver());
 		softAssert = new SoftAssert();
 	}
 
 	@Given("User is on Home Page")
 	public void user_is_on_home_page() {
-		Assert.assertEquals(homePage.getPageURL(), UIConstants.EXPECTED_URL_VALUE_HOMEPAGE);
+		Assert.assertEquals(homePage.getPageURL(), Constants.EXPECTED_URL_VALUE_HOMEPAGE);
 	}
 
 	@When("User clicks on the {string} banner")
@@ -55,17 +59,17 @@ public class HomepageSteps {
 		switch (page.trim().toUpperCase()) {
 		case "HOMEPAGE":
 			homePage = (HomePage)pageObject;
-			Assert.assertEquals(homePage.getPageURL(), UIConstants.EXPECTED_URL_VALUE_HOMEPAGE);
+			Assert.assertEquals(homePage.getPageURL(), Constants.EXPECTED_URL_VALUE_HOMEPAGE);
 			break;
 		
 		case "CONTACTPAGE":
 			ContactPage contactPage = (ContactPage)pageObject;
-			Assert.assertTrue(contactPage.getPageURL().contains(UIConstants.PARTIAL_URL_VALUE_CONTACTPAGE));
+			Assert.assertTrue(contactPage.getPageURL().contains(Constants.PARTIAL_URL_VALUE_CONTACTPAGE));
 			break;
 		
 		case "SIGN IN":
 			LoginPage loginPage = (LoginPage)pageObject;
-			Assert.assertTrue(loginPage.getPageURL().contains(UIConstants.PARTIAL_URL_VALUE_LOGINPAGE));
+			Assert.assertTrue(loginPage.getPageURL().contains(Constants.PARTIAL_URL_VALUE_LOGINPAGE));
 			break;
 		}
 	}
@@ -78,13 +82,13 @@ public class HomepageSteps {
 		case "Categories":
 			softAssert.assertEquals((Integer)homePage.getAllCategoriesOptions().get("Count"), optionCount);
 			System.out.println(homePage.getAllCategoriesOptions().get("List"));
-			softAssert.assertEquals(homePage.getAllCategoriesOptions().get("List"), UIConstants.EXPECTED_CATEGORY_NAMES);
+			softAssert.assertEquals(homePage.getAllCategoriesOptions().get("List"), Constants.EXPECTED_CATEGORY_NAMES);
 		break;
 		
 		case "Language":
 			softAssert.assertEquals((Integer)homePage.getAllLanguagesOptions().get("Count"), optionCount);
 			System.out.println(homePage.getAllLanguagesOptions().get("List"));
-			softAssert.assertEquals(homePage.getAllLanguagesOptions().get("List"), UIConstants.EXPECTED_LANGUAGE_OPTIONS);
+			softAssert.assertEquals(homePage.getAllLanguagesOptions().get("List"), Constants.EXPECTED_LANGUAGE_OPTIONS);
 		} 
 		
 		softAssert.assertAll();
@@ -164,7 +168,7 @@ public class HomepageSteps {
 	@When("User selects the {string} category checkbox")
 	public void user_selects_the_category_checkbox(String categoryName) {
 		homePage.selectCheckbox(categoryName);
-		context.setRuntimeData("subcategory", categoryName.trim());
+		context.setRuntimeData("searchedSubcategory", categoryName.trim());
 	}
 
 	@Then("User should see only products in the {string} category displayed")
@@ -227,7 +231,7 @@ public class HomepageSteps {
 	@When("User selects the {string} brand checkbox")
 	public void user_selects_the_brand_checkbox(String brandName) {
 		homePage.selectCheckbox(brandName);
-		context.setRuntimeData("brandName", brandName.trim());
+		context.setRuntimeData("searchedBrandName", brandName.trim());
 		
 	}
 	
@@ -286,87 +290,24 @@ public class HomepageSteps {
 	/************************** Complete Customer Flow ***************************/
 	
 	@Then("User clicks {string} image and views product details")
-	public void user_clicks_image_and_views_product_details(String productName) {
+	public void user_clicks_image_and_views_product_details(String searchedProductName) {
 
-		Map<String, Object> obj = homePage.viewProduct(productName.trim());		
-		int productCardPrice = (int) obj.get("productPrice");
+		Map<String, Object> obj = homePage.viewProduct(searchedProductName.trim());		
+		int searchedProductCardPrice = (int) obj.get("productPrice");
 		productPage = (ProductPage)obj.get("pageObj");
 		
-		Map<String,Object> productDetailsFromProductPage = productPage.getProductDetails();
-		softAssert.assertEquals(productName, String.valueOf(productDetailsFromProductPage.get("productName")));
-		softAssert.assertEquals(productCardPrice, (int)productDetailsFromProductPage.get("productPrice"));
-		softAssert.assertEquals(String.valueOf(context.getRuntimeData("subcategory")), String.valueOf(productDetailsFromProductPage.get("subcategory")));
-		softAssert.assertEquals(String.valueOf(context.getRuntimeData("brandName")), String.valueOf(productDetailsFromProductPage.get("brand")));
+		//Validation between searched criteria Vs Product details in ProductPage
+		Product product = productPage.getProductDetails();
+		softAssert.assertEquals(searchedProductName, product.getName());
+		softAssert.assertEquals(searchedProductCardPrice, product.getPrice());
+		softAssert.assertEquals(String.valueOf(context.getRuntimeData("searchedSubcategory")), product.getSubCategory());
+		softAssert.assertEquals(String.valueOf(context.getRuntimeData("searchedBrandName")), product.getBrand());
 		
 		softAssert.assertAll();
 		
-		context.setRuntimeData("productName", productName);
-		context.setRuntimeData("UnitPrice", productCardPrice);
+		context.setRuntimeData("product", product);
 
 	}
 	
-	@Then("User enters quantity and adds the product to the cart")
-	public void user_enters_quantity_and_adds_the_product_to_the_cart() {
-		
-		int productQuantityOrdered = 2;
-		productPage.setProductQuantity(String.valueOf(productQuantityOrdered));
-		
-		int cartQuantity = productPage.getCartQuantity();
-		Assert.assertTrue(cartQuantity>=productQuantityOrdered);
-		
-		context.setRuntimeData("Quantity", productQuantityOrdered);
-	}
 	
-	@Then("User sees product details in CartPage")
-	public void user_sees_product_details_in_cart_page() {
-
-		checkoutPage = productPage.navigateToCheckoutPage();
-		Map<String, Map<String, Object>> productInfoFromCheckoutPage = checkoutPage.getAllProductInfo();
-		String product = String.valueOf(context.getRuntimeData("productName"));
-		Map<String, Object> info = productInfoFromCheckoutPage.get(product);
-		
-		softAssert.assertEquals((int)context.getRuntimeData("Quantity"), (int)info.get("Quantity"));
-		softAssert.assertEquals((int)context.getRuntimeData("UnitPrice"), (int)info.get("UnitPrice"));
-		softAssert.assertEquals((int)context.getRuntimeData("Quantity")*(int)context.getRuntimeData("UnitPrice"), (int)info.get("ProductTotalPrice"));
-		
-		softAssert.assertAll();
-	}
-	
-	@Then("completes the checkout process")
-	public void completes_the_checkout_process() {
-		
-		//Step1: CartPage
-		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
-		
-		//Step2: Sign-in step
-		Register registeredUserInfo = (Register)context.getRuntimeData("userInfo");
-		String fullName = registeredUserInfo.getFirstName()+" "+registeredUserInfo.getLastName();
-		String signedInText = checkoutPage.getSignedInText();
-		
-		softAssert.assertTrue(signedInText.contains(fullName));
-		
-		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
-		
-		//Step3: BillingAddress step
-		Map<String, String> savedBillingInfo = checkoutPage.getBillingAddressInfo();
-		softAssert.assertEquals(registeredUserInfo.getStreet(),savedBillingInfo.get("Street"));
-		softAssert.assertEquals(registeredUserInfo.getCity(),savedBillingInfo.get("City"));
-		softAssert.assertEquals(registeredUserInfo.getState(),savedBillingInfo.get("State"));
-		softAssert.assertEquals(registeredUserInfo.getCountry(),savedBillingInfo.get("Country"));
-		softAssert.assertEquals(registeredUserInfo.getPostalCode(),savedBillingInfo.get("Zipcode"));
-		
-		softAssert.assertAll();
-		
-		checkoutPage.clickCheckoutOrConfirmBtn("Proceed to checkout");
-		
-		//Step4: Payment step
-		checkoutPage.selectPaymentMethod("Cash on Delivery");
-		checkoutPage.clickCheckoutOrConfirmBtn("Confirm");
-		//Payment was successful
-		Assert.assertEquals(checkoutPage.getPaymentSuccessText(), UIConstants.PAYMENT_SUCCESSFUL_TEXT);
-		
-		//Sign out
-		homePage = (HomePage)checkoutPage.goToMyPages(fullName, "Sign out");
-		Assert.assertTrue(homePage.doesSearchBoxExist());
-	}
 }
