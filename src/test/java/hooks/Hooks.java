@@ -63,9 +63,7 @@ public class Hooks {
 						
 					synchronized (this) {
 						
-						testData = (List<Map<String, String>>) globalContext.getGlobalData("registrationTestDataTable");
-						Log.info("Inside @Before(\"@testData\") for Registration");
-						Log.info("is GlobalData 'testData' empty/null/available = " + testData + " for Registration"); 
+						testData = (List<Map<String, String>>) globalContext.getGlobalData("registrationTestDataTable");	
 						
 						if (testData == null || testData.isEmpty()) {
 							globalContext.setTestData(ExcelReader.getExcelData(Constants.REGISTRATION_EXCEL_SHEET_NAME));
@@ -113,11 +111,8 @@ public class Hooks {
 		if (scenario.isFailed()) {
 			TakesScreenshot takesScreenshot = (TakesScreenshot) DriverFactory.getDriver();
 			final byte[] screenshot = takesScreenshot.getScreenshotAs(OutputType.BYTES);
-			
-			//For Extent Report Attachment
-			scenario.attach(screenshot, "image/png", screenshot.toString());
-			//For Allure Report Attachment
 			String currentScenarioName = scenario.getName();
+			scenario.attach(screenshot, "image/png", currentScenarioName);
 			Allure.addAttachment(currentScenarioName,new ByteArrayInputStream(screenshot));
 			
 		}

@@ -19,7 +19,7 @@ public abstract class Banner {
 	By dropdownSection_Categories = By.xpath("//ul[contains(@class,'dropdown-menu')][@aria-label='nav-categories']");
 	By dropdownSection_Langugages = By.xpath("//ul[@id='dropdown-animated']");
 
-	protected Banner(WebDriver driver) {// Prevents instantiation from outside this class or subclasses
+	protected Banner(WebDriver driver) {
 		this.driver = driver;
 		util = new ElementUtil(driver);
 	}

@@ -9,7 +9,7 @@ public class DynamicDataGenerator {
 	}
 
 	public static String generateRandomString(int length) {
-		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // You can include lowercase or digits if needed
+		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		Random random = new Random();
 		StringBuilder result = new StringBuilder(length);
 

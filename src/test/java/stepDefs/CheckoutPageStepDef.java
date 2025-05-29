@@ -19,8 +19,8 @@ import utils.TestContextManager;
 
 public class CheckoutPageStepDef {
 
-	GlobalContext globalContext = GlobalContext.getInstance(); // ✅ Singleton access
-	Context context = TestContextManager.getContext(); // ✅ Thread-local
+	GlobalContext globalContext = GlobalContext.getInstance(); 
+	Context context = TestContextManager.getContext(); 
 	
 	ProductPage productPage;
 	CheckoutPage checkoutPage;

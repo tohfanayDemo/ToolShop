@@ -34,13 +34,6 @@ public class DriverFactory {
 		envBrowser = System.getProperty("browser");
 		testNGBrowser = getTestNGBrowserType();
 		propBrowser = prop.getProperty("browser");
-		
-		System.out.println("=======================================================");
-		System.out.println();
-		System.out.println("Inside WEBDRIVER CLASS");
-		System.out.println("Value of Browser from TestNG.xml = " + testNGBrowser);
-		System.out.println();
-		System.out.println("=======================================================");
 
 		if (envBrowser != null) {// 1st priority env value
 			browser = envBrowser;

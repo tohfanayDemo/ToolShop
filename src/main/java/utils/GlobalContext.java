@@ -30,7 +30,6 @@ public class GlobalContext {
 
     public void emptyTestDataMap() {
         testData.clear();
-        System.out.println("Test data cleared.");
     }
 
     public void setGlobalData(String key, Object value) {
@@ -43,6 +42,5 @@ public class GlobalContext {
 
     public void emptyGlobalDataMap() {
     	globalDataMap.clear();
-        System.out.println("GlobalDataMap data cleared.");
     }
 }

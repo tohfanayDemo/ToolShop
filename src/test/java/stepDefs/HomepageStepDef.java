@@ -24,8 +24,8 @@ import utils.TestContextManager;
 
 public class HomepageStepDef {
 	
-	GlobalContext globalContext = GlobalContext.getInstance(); // ✅ Singleton access
-	Context context = TestContextManager.getContext(); // ✅ Thread-local
+	GlobalContext globalContext = GlobalContext.getInstance(); 
+	Context context = TestContextManager.getContext(); 
 	
 	Object pageObject;
 	HomePage homePage;
