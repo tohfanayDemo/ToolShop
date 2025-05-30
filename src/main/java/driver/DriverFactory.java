@@ -43,7 +43,6 @@ public class DriverFactory {
 			browser = propBrowser;
 		}
 
-		System.out.println("BROWSER TO BE SET (INSIDE WEBDRIVER CLASS)= " + testNGBrowser);
 		switch (browser.toLowerCase().trim()) {
 		case "chrome":
 			tlDriver.set(new ChromeDriver());
@@ -85,7 +84,7 @@ public class DriverFactory {
 
 		try {
 			if (envName == null) {
-				Log.warn("env is null....hence running tests on QA env");
+				Log.warn("env is null....hence, running tests on QA env");
 				ip = new FileInputStream("./src/test/resources/config/qa.config.properties");
 			} else {
 				switch (envName.toLowerCase().trim()) {

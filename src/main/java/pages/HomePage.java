@@ -125,7 +125,6 @@ public class HomePage extends Banner{
 
 			if(priceOrNameOrUrl.trim().equalsIgnoreCase("Price")) {
 				
-				System.out.println("On page = " + pageNum);
 				WebElement prodGrid = util.getElement(productGrid);
 				products = prodGrid.findElements(By.xpath(".//a//span[@data-test='product-price']"));
 				
@@ -141,7 +140,6 @@ public class HomePage extends Banner{
 				
 			}
 			else if(priceOrNameOrUrl.trim().equalsIgnoreCase("Url")) {
-				System.out.println("On page = " + pageNum);
 				WebElement prodGrid = util.getElement(productGrid);
 				products = prodGrid.findElements(By.xpath("./a"));
 				
@@ -156,7 +154,6 @@ public class HomePage extends Banner{
 			}
 			else {	
 				
-				System.out.println("On page = " + pageNum);
 				WebElement prodGrid = util.getElement(productGrid);
 				products = prodGrid.findElements(By.xpath(".//h5"));
 				
